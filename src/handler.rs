@@ -68,6 +68,14 @@ async fn create_quest_handler(
     body.createdAt = Some(datetime);
     body.updatedAt = Some(datetime);
 
+    if body.deadline.is_none() {
+        let error_response = GenericResponse {
+            status: "fail".to_string(),
+            message: "Deadline is required.".to_string(),
+        };
+        return HttpResponse::Conflict().json(error_response);
+    }
+
     let quest = body.to_owned();
 
     vec.push(body.into_inner());
@@ -144,6 +152,7 @@ async fn edit_quest_handler(
         } else {
             quest.content.to_owned()
         },
+        deadline: body.deadline.or(quest.deadline),
         completed: if body.completed.is_some() {
             body.completed
         } else {

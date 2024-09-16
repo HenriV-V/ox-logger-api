@@ -8,6 +8,7 @@ pub struct Quest {
     pub id: Option<String>,
     pub title: String,
     pub content: String,
+    pub deadline: Option<NaiveDate>,
     pub completed: Option<bool>,
     pub createdAt: Option<DateTime<Local>>,
     pub updatedAt: Option<DateTime<Local>>,
@@ -36,5 +37,6 @@ pub struct QueryOption {
 pub struct UpdateQuestSchema {
     pub title: Option<String>,
     pub content: Option<String>,
+    pub deadline: Option<NaiveDate>,
     pub completed: Option<bool>,
 }
