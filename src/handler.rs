@@ -1,7 +1,7 @@
 use crate::{
     model::{AppState, QueryOption, Quest, UpdateQuestSchema},
     response::{GenericResponse, QuestData, QuestListResponse, SingleQuestResponse},
-    utils::days_left,
+    utils::{days_left, min_hours_per_day}
 };
 
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
@@ -96,11 +96,14 @@ async fn create_quest_handler(
         None
     };
 
+    let min_hours_per_day_count = min_hours_per_day(days_left_count.unwrap_or(0), quest.hours_invested, quest.hours_needed);
+
     let json_response = SingleQuestResponse {
         status: "success".to_string(),
         data: QuestData {
             quest,
             days_left: days_left_count,
+            min_hours_per_day: Some(min_hours_per_day_count),
         },
     };
 
@@ -129,11 +132,15 @@ async fn get_quest_handler(path: web::Path<String>, data: web::Data<AppState>) -
     } else {
         None
     };
+
+    let min_hours_per_day_count = min_hours_per_day(days_left_count.unwrap_or(0), quest.hours_invested, quest.hours_needed);
+
     let json_response = SingleQuestResponse {
         status: "success".to_string(),
         data: QuestData {
             quest: quest.clone(),
             days_left: days_left_count,
+            min_hours_per_day: Some(min_hours_per_day_count),
         },
     };
 
@@ -198,11 +205,14 @@ async fn edit_quest_handler(
         None
     };
 
+    let min_hours_per_day_count = min_hours_per_day(days_left_count.unwrap_or(0), quest.hours_invested, quest.hours_needed);
+
     let json_response = SingleQuestResponse {
         status: "success".to_string(),
         data: QuestData {
             quest: quest.clone(),
             days_left: days_left_count,
+            min_hours_per_day: Some(min_hours_per_day_count),
         },
     };
 

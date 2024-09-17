@@ -12,6 +12,7 @@ pub struct GenericResponse {
 pub struct QuestData {
     pub quest: Quest,
     pub days_left: Option<i64>,
+    pub min_hours_per_day: Option<f64>,
 }
 
 #[derive(Serialize, Debug)]
