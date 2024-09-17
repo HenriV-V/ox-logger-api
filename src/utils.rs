@@ -1,5 +1,4 @@
 use chrono::{Datelike, NaiveDate, Duration, Local};
-
 pub fn days_left(deadline: NaiveDate) -> i64 {
     let today = Local::now().date_naive();
     let mut current_date = today;

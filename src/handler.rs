@@ -65,6 +65,7 @@ async fn create_quest_handler(
     let datetime = Local::now();
 
     body.id = Some(uuid_id.to_string());
+    body.hours_invested = Some(0.0);
     body.completed = Some(false);
     body.createdAt = Some(datetime);
     body.updatedAt = Some(datetime);
@@ -73,6 +74,14 @@ async fn create_quest_handler(
         let error_response = GenericResponse {
             status: "fail".to_string(),
             message: "Deadline is required.".to_string(),
+        };
+        return HttpResponse::Conflict().json(error_response);
+    }
+
+    if body.hours_needed.is_none() {
+        let error_response = GenericResponse {
+            status: "fail".to_string(),
+            message: "Hours needed is required.".to_string(),
         };
         return HttpResponse::Conflict().json(error_response);
     }
@@ -154,6 +163,10 @@ async fn edit_quest_handler(
     let datetime = Local::now();
     let title = body.title.to_owned().unwrap_or(quest.title.to_owned());
     let content = body.content.to_owned().unwrap_or(quest.content.to_owned());
+
+    let new_hours_invested = body.hours_invested.unwrap_or(0.0);
+    let updated_hours_invested = quest.hours_invested.unwrap_or(0.0) + new_hours_invested;
+
     let payload = Quest {
         id: quest.id.to_owned(),
         title: if !title.is_empty() {
@@ -166,7 +179,9 @@ async fn edit_quest_handler(
         } else {
             quest.content.to_owned()
         },
-        deadline: body.deadline.or(quest.deadline),
+        deadline: quest.deadline,
+        hours_needed: quest.hours_needed,
+        hours_invested: Some(updated_hours_invested),
         completed: if body.completed.is_some() {
             body.completed
         } else {
