@@ -1,6 +1,7 @@
 use crate::{
     model::{AppState, QueryOption, Quest, UpdateQuestSchema},
     response::{GenericResponse, QuestData, QuestListResponse, SingleQuestResponse},
+    utils::days_left,
 };
 
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
@@ -80,19 +81,25 @@ async fn create_quest_handler(
 
     vec.push(body.into_inner());
 
+    let days_left_count = if let Some(deadline) = quest.deadline {
+        Some(days_left(deadline))
+    } else {
+        None
+    };
+
     let json_response = SingleQuestResponse {
         status: "success".to_string(),
-        data: QuestData { quest },
+        data: QuestData {
+            quest,
+            days_left: days_left_count,
+        },
     };
 
     HttpResponse::Ok().json(json_response)
 }
 
 #[get("/quests/{id}")]
-async fn get_quest_handler(
-    path: web::Path<String>,
-    data: web::Data<AppState>
-) -> impl Responder {
+async fn get_quest_handler(path: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let vec = data.quest_db.lock().unwrap();
 
     let id = path.into_inner();
@@ -107,10 +114,17 @@ async fn get_quest_handler(
     }
 
     let quest = quest.unwrap();
+
+    let days_left_count = if let Some(deadline) = quest.deadline {
+        Some(days_left(deadline))
+    } else {
+        None
+    };
     let json_response = SingleQuestResponse {
         status: "success".to_string(),
         data: QuestData {
             quest: quest.clone(),
+            days_left: days_left_count,
         },
     };
 
@@ -163,10 +177,17 @@ async fn edit_quest_handler(
     };
     *quest = payload;
 
+    let days_left_count = if let Some(deadline) = quest.deadline {
+        Some(days_left(deadline))
+    } else {
+        None
+    };
+
     let json_response = SingleQuestResponse {
         status: "success".to_string(),
         data: QuestData {
             quest: quest.clone(),
+            days_left: days_left_count,
         },
     };
 

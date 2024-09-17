@@ -11,6 +11,7 @@ pub struct GenericResponse {
 #[derive(Serialize, Debug)]
 pub struct QuestData {
     pub quest: Quest,
+    pub days_left: Option<i64>,
 }
 
 #[derive(Serialize, Debug)]
